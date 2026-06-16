@@ -17,7 +17,7 @@ const loginSchema = z.object({
 type LoginForm = z.infer<typeof loginSchema>
 
 // Admin ma'lumotlari (yashirin)
-const ADMIN_CREDENTIALS = { username: 'admin', password: 'admin123' }
+const ADMIN_CREDENTIALS = { username: 'Robiya', password: 'Robiya' }
 
 export default function LoginPage() {
   const router = useRouter()
