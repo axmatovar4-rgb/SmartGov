@@ -16,6 +16,12 @@ const loginSchema = z.object({
 })
 type LoginForm = z.infer<typeof loginSchema>
 
+// Mock foydalanuvchilar
+const MOCK_USERS = [
+  { username: 'admin',      password: 'admin123',    role: 'ADMIN' },
+  { username: 'ali_valiyev', password: 'Parol1234',  role: 'USER'  },
+]
+
 export default function LoginPage() {
   const router = useRouter()
   const { lang } = useLangStore()
@@ -32,33 +38,32 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginForm) => {
     setLoading(true)
     setServerError('')
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      })
-      if (!res.ok) {
-        setServerError(lang === 'uz'
-          ? "Username yoki parol noto'g'ri"
-          : lang === 'ru'
-          ? 'Неверное имя пользователя или пароль'
-          : 'Incorrect username or password')
-        return
-      }
-      const { accessToken, refreshToken } = await res.json()
-      localStorage.setItem('accessToken', accessToken)
-      localStorage.setItem('refreshToken', refreshToken)
-      router.push('/dashboard')
-    } catch {
-      setServerError(lang === 'uz'
-        ? "Xatolik yuz berdi. Qayta urinib ko'ring."
-        : lang === 'ru'
-        ? 'Произошла ошибка. Попробуйте снова.'
-        : 'An error occurred. Please try again.')
-    } finally {
+
+    // Mock login — backend bo'lguncha
+    await new Promise(r => setTimeout(r, 600)) // loading effekti
+    const found = MOCK_USERS.find(
+      u => u.username === data.username && u.password === data.password
+    )
+    if (!found) {
+      setServerError(
+        lang === 'uz' ? "Username yoki parol noto'g'ri" :
+        lang === 'ru' ? 'Неверное имя пользователя или пароль' :
+        'Incorrect username or password'
+      )
       setLoading(false)
+      return
     }
+    // Rolni saqlash
+    localStorage.setItem('role', found.role)
+    localStorage.setItem('username', found.username)
+
+    // Yo'naltirish
+    if (found.role === 'ADMIN') {
+      router.push('/admin')
+    } else {
+      router.push('/dashboard')
+    }
+    setLoading(false)
   }
 
   return (
@@ -82,6 +87,13 @@ export default function LoginPage() {
               {t.loginRegisterLink}
             </Link>
           </p>
+
+          {/* Demo ma'lumotlar */}
+          <div className="bg-primary/5 border border-primary/20 rounded-lg px-4 py-3 mb-5 text-xs space-y-1">
+            <p className="font-semibold text-primary mb-1">Demo kirish:</p>
+            <p className="text-text-secondary">👨‍💼 Admin: <span className="font-mono font-medium text-text-primary">admin</span> / <span className="font-mono font-medium text-text-primary">admin123</span></p>
+            <p className="text-text-secondary">👤 User: <span className="font-mono font-medium text-text-primary">ali_valiyev</span> / <span className="font-mono font-medium text-text-primary">Parol1234</span></p>
+          </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
             {/* Username */}

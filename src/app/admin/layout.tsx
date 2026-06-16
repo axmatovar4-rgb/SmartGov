@@ -65,12 +65,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {/* Chiqish */}
         <div className="px-3 py-4 border-t border-white/10">
-          <Link href="/"
+          <button
+            onClick={() => {
+              localStorage.removeItem('role')
+              localStorage.removeItem('username')
+              window.location.href = '/'
+            }}
             className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm
-                       text-white/70 hover:bg-white/10 hover:text-white transition-colors">
+                       text-white/70 hover:bg-white/10 hover:text-white transition-colors w-full">
             <LogOut size={18} />
             Chiqish
-          </Link>
+          </button>
         </div>
       </aside>
 
