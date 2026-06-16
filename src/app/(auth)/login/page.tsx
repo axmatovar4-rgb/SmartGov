@@ -16,11 +16,8 @@ const loginSchema = z.object({
 })
 type LoginForm = z.infer<typeof loginSchema>
 
-// Mock foydalanuvchilar
-const MOCK_USERS = [
-  { username: 'admin',      password: 'admin123',    role: 'ADMIN' },
-  { username: 'ali_valiyev', password: 'Parol1234',  role: 'USER'  },
-]
+// Admin ma'lumotlari (yashirin)
+const ADMIN_CREDENTIALS = { username: 'admin', password: 'admin123' }
 
 export default function LoginPage() {
   const router = useRouter()
@@ -38,31 +35,16 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginForm) => {
     setLoading(true)
     setServerError('')
+    await new Promise(r => setTimeout(r, 500))
 
-    // Mock login — backend bo'lguncha
-    await new Promise(r => setTimeout(r, 600)) // loading effekti
-    const found = MOCK_USERS.find(
-      u => u.username === data.username && u.password === data.password
-    )
-    if (!found) {
-      setServerError(
-        lang === 'uz' ? "Username yoki parol noto'g'ri" :
-        lang === 'ru' ? 'Неверное имя пользователя или пароль' :
-        'Incorrect username or password'
-      )
-      setLoading(false)
-      return
-    }
-    // Rolni saqlash
-    localStorage.setItem('role', found.role)
-    localStorage.setItem('username', found.username)
+    const isAdmin =
+      data.username === ADMIN_CREDENTIALS.username &&
+      data.password === ADMIN_CREDENTIALS.password
 
-    // Yo'naltirish
-    if (found.role === 'ADMIN') {
-      router.push('/admin')
-    } else {
-      router.push('/dashboard')
-    }
+    localStorage.setItem('role', isAdmin ? 'ADMIN' : 'USER')
+    localStorage.setItem('username', data.username)
+
+    router.push(isAdmin ? '/admin' : '/dashboard')
     setLoading(false)
   }
 
@@ -87,13 +69,6 @@ export default function LoginPage() {
               {t.loginRegisterLink}
             </Link>
           </p>
-
-          {/* Demo ma'lumotlar */}
-          <div className="bg-primary/5 border border-primary/20 rounded-lg px-4 py-3 mb-5 text-xs space-y-1">
-            <p className="font-semibold text-primary mb-1">Demo kirish:</p>
-            <p className="text-text-secondary">👨‍💼 Admin: <span className="font-mono font-medium text-text-primary">admin</span> / <span className="font-mono font-medium text-text-primary">admin123</span></p>
-            <p className="text-text-secondary">👤 User: <span className="font-mono font-medium text-text-primary">ali_valiyev</span> / <span className="font-mono font-medium text-text-primary">Parol1234</span></p>
-          </div>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
             {/* Username */}
