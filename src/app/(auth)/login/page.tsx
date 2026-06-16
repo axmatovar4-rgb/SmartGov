@@ -12,12 +12,12 @@ import { translations } from '@/lib/i18n'
 
 const loginSchema = z.object({
   username: z.string().min(3),
-  password: z.string().min(8),
+  password: z.string().min(6),
 })
 type LoginForm = z.infer<typeof loginSchema>
 
 // Admin ma'lumotlari (yashirin)
-const ADMIN_CREDENTIALS = { username: 'Robiya', password: 'Robiya' }
+const ADMIN_CREDENTIALS = { username: 'Robiya', password: 'Robiya2010' }
 
 export default function LoginPage() {
   const router = useRouter()
